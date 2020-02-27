@@ -20,6 +20,8 @@
 import dateMath from '@elastic/datemath';
 import classNames from 'classnames';
 import React, { useState } from 'react';
+import { i18n } from '@kbn/i18n';
+
 import {
   EuiButton,
   EuiFlexGroup,
@@ -31,7 +33,7 @@ import {
 } from '@elastic/eui';
 // @ts-ignore
 import { EuiSuperUpdateButton, OnRefreshProps } from '@elastic/eui';
-import { FormattedMessage, InjectedIntl, injectI18n } from '@kbn/i18n/react';
+import { FormattedMessage } from '@kbn/i18n/react';
 import { Toast } from 'src/core/public';
 import { IDataPluginServices, IIndexPattern, TimeRange, TimeHistoryContract, Query } from '../..';
 import { useKibana, toMountPoint } from '../../../../kibana_react/public';
@@ -48,7 +50,6 @@ interface Props {
   disableAutoFocus?: boolean;
   screenTitle?: string;
   indexPatterns?: Array<IIndexPattern | string>;
-  intl: InjectedIntl;
   isLoading?: boolean;
   prepend?: React.ComponentProps<typeof EuiFieldText>['prepend'];
   showQueryInput?: boolean;
@@ -285,7 +286,6 @@ function QueryBarTopRowUI(props: Props) {
 
   function handleLuceneSyntaxWarning() {
     if (!props.query) return;
-    const { intl } = props;
     const { query, language } = props.query;
     if (
       language === 'kuery' &&
@@ -294,8 +294,7 @@ function QueryBarTopRowUI(props: Props) {
       doesKueryExpressionHaveLuceneSyntaxError(query)
     ) {
       const toast = notifications!.toasts.addWarning({
-        title: intl.formatMessage({
-          id: 'data.query.queryBar.luceneSyntaxWarningTitle',
+        title: i18n.translate('data.query.queryBar.luceneSyntaxWarningTitle', {
           defaultMessage: 'Lucene syntax warning',
         }),
         text: toMountPoint(
@@ -363,4 +362,4 @@ QueryBarTopRowUI.defaultProps = {
   showAutoRefreshOnly: false,
 };
 
-export const QueryBarTopRow = injectI18n(QueryBarTopRowUI);
+export const QueryBarTopRow = QueryBarTopRowUI;
