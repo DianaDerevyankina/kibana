@@ -30,6 +30,7 @@ import {
   EuiButton,
   EuiLink,
   htmlIdGenerator,
+  EuiInputPopover,
 } from '@elastic/eui';
 
 import { FormattedMessage } from '@kbn/i18n/react';
@@ -563,6 +564,51 @@ export class QueryStringInputUI extends Component<Props, State> {
     });
   };
 
+  private queryInput = (
+    <EuiTextArea
+      placeholder={
+        this.props.placeholder ||
+        i18n.translate('data.query.queryBar.searchInputPlaceholder', {
+          defaultMessage: 'Search',
+        })
+      }
+      value={this.getQueryString()}
+      onKeyDown={this.onKeyDown}
+      onKeyUp={this.onKeyUp}
+      onChange={this.onInputChange}
+      onClick={this.onClickInput}
+      onBlur={this.onInputBlur}
+      onFocus={this.handleOnFocus}
+      className="kbnQueryBar__textarea"
+      fullWidth
+      rows={1}
+      id={this.textareaId}
+      autoFocus={this.props.onChangeQueryInputFocus ? false : !this.props.disableAutoFocus}
+      inputRef={(node: any) => {
+        if (node) {
+          this.inputRef = node;
+        }
+      }}
+      autoComplete="off"
+      spellCheck={false}
+      aria-label={i18n.translate('data.query.queryBar.searchInputAriaLabel', {
+        defaultMessage: 'Start typing to search and filter the {pageType} page',
+        values: { pageType: this.services.appName },
+      })}
+      aria-autocomplete="list"
+      aria-controls={this.state.isSuggestionsVisible ? 'kbnTypeahead__items' : undefined}
+      aria-activedescendant={
+        this.state.isSuggestionsVisible && typeof this.state.index === 'number'
+          ? `suggestion-${this.state.index}`
+          : undefined
+      }
+      role="textbox"
+      data-test-subj={this.props.dataTestSubj || 'queryInput'}
+    >
+      {this.getQueryString()}
+    </EuiTextArea>
+  );
+
   public render() {
     const isSuggestionsVisible = this.state.isSuggestionsVisible && {
       'aria-controls': 'kbnTypeahead__items',
@@ -588,60 +634,21 @@ export class QueryStringInputUI extends Component<Props, State> {
               role="search"
               className="euiFormControlLayout__childrenWrapper kuiLocalSearchAssistedInput"
             >
-              <EuiTextArea
-                placeholder={
-                  this.props.placeholder ||
-                  i18n.translate('data.query.queryBar.searchInputPlaceholder', {
-                    defaultMessage: 'Search',
-                  })
-                }
-                value={this.getQueryString()}
-                onKeyDown={this.onKeyDown}
-                onKeyUp={this.onKeyUp}
-                onChange={this.onInputChange}
-                onClick={this.onClickInput}
-                onBlur={this.onInputBlur}
-                onFocus={this.handleOnFocus}
-                className="kbnQueryBar__textarea"
-                fullWidth
-                rows={1}
-                id={this.textareaId}
-                autoFocus={
-                  this.props.onChangeQueryInputFocus ? false : !this.props.disableAutoFocus
-                }
-                inputRef={(node: any) => {
-                  if (node) {
-                    this.inputRef = node;
-                  }
-                }}
-                autoComplete="off"
-                spellCheck={false}
-                aria-label={i18n.translate('data.query.queryBar.searchInputAriaLabel', {
-                  defaultMessage: 'Start typing to search and filter the {pageType} page',
-                  values: { pageType: this.services.appName },
-                })}
-                aria-autocomplete="list"
-                aria-controls={this.state.isSuggestionsVisible ? 'kbnTypeahead__items' : undefined}
-                aria-activedescendant={
-                  this.state.isSuggestionsVisible && typeof this.state.index === 'number'
-                    ? `suggestion-${this.state.index}`
-                    : undefined
-                }
-                role="textbox"
-                data-test-subj={this.props.dataTestSubj || 'queryInput'}
+              <EuiInputPopover
+                input={this.queryInput}
+                isOpen={this.state.isSuggestionsVisible}
+                closePopover={() => this.setState({ isSuggestionsVisible: false, index: null })}
               >
-                {this.getQueryString()}
-              </EuiTextArea>
+                <SuggestionsComponent
+                  show={this.state.isSuggestionsVisible}
+                  suggestions={this.state.suggestions.slice(0, this.state.suggestionLimit)}
+                  index={this.state.index}
+                  onClick={this.onClickSuggestion}
+                  onMouseEnter={this.onMouseEnterSuggestion}
+                  loadMore={this.increaseLimit}
+                />
+              </EuiInputPopover>
             </div>
-
-            <SuggestionsComponent
-              show={this.state.isSuggestionsVisible}
-              suggestions={this.state.suggestions.slice(0, this.state.suggestionLimit)}
-              index={this.state.index}
-              onClick={this.onClickSuggestion}
-              onMouseEnter={this.onMouseEnterSuggestion}
-              loadMore={this.increaseLimit}
-            />
           </div>
         </EuiOutsideClickDetector>
 
