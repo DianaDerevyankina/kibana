@@ -10,6 +10,7 @@ import { Observable } from 'rxjs';
 import { Adapters } from '../types';
 import { IContainer } from '../containers/i_container';
 import { EmbeddableInput } from '../../../common/types';
+import { Vis } from '../../../../visualizations/public';
 
 export interface EmbeddableError {
   name: string;
@@ -30,6 +31,7 @@ export interface EmbeddableOutput {
   title?: string;
   editable?: boolean;
   savedObjectId?: string;
+  visTypeName?: string;
 }
 
 export interface IEmbeddable<
@@ -77,6 +79,8 @@ export interface IEmbeddable<
    * If this embeddable has encountered a fatal error, that error will be stored here
    **/
   fatalError?: Error;
+
+  vis: Vis;
 
   /**
    * A functional representation of the isContainer variable, but helpful for typescript to
