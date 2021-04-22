@@ -27,7 +27,8 @@ export async function getSeriesData(
   requestContext: VisTypeTimeseriesRequestHandlerContext,
   req: VisTypeTimeseriesVisDataRequest,
   panel: PanelSchema,
-  services: VisTypeTimeseriesRequestServices
+  services: VisTypeTimeseriesRequestServices,
+  wasRequestedByInfra: boolean
 ) {
   const panelIndex = await services.cachedIndexPatternFetcher(panel.index_pattern);
 
@@ -59,12 +60,17 @@ export async function getSeriesData(
     const searches = await Promise.all(bodiesPromises);
     const data = await searchStrategy.search(requestContext, req, searches);
 
-    const handleResponseBodyFn = handleResponseBody(panel, req, {
-      indexPatternsService: services.indexPatternsService,
-      cachedIndexPatternFetcher: services.cachedIndexPatternFetcher,
-      searchStrategy,
-      capabilities,
-    });
+    const handleResponseBodyFn = handleResponseBody(
+      panel,
+      req,
+      {
+        indexPatternsService: services.indexPatternsService,
+        cachedIndexPatternFetcher: services.cachedIndexPatternFetcher,
+        searchStrategy,
+        capabilities,
+      },
+      wasRequestedByInfra
+    );
 
     const series = await Promise.all(
       data.map(

@@ -21,7 +21,8 @@ import { VisTypeTimeseriesVisDataRequest } from '../../../types';
 export function handleResponseBody(
   panel: PanelSchema,
   req: VisTypeTimeseriesVisDataRequest,
-  services: FieldsFetcherServices
+  services: FieldsFetcherServices,
+  wasRequestedByInfra: boolean
 ) {
   return async (resp: any) => {
     if (resp.error) {
@@ -49,7 +50,15 @@ export function handleResponseBody(
 
     const extractFields = createFieldsFetcher(req, services);
 
-    const processor = buildProcessorFunction(processors, resp, panel, series, meta, extractFields);
+    const processor = buildProcessorFunction(
+      processors,
+      resp,
+      panel,
+      series,
+      meta,
+      extractFields,
+      wasRequestedByInfra
+    );
 
     return await processor([]);
   };

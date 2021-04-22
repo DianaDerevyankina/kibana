@@ -14,9 +14,12 @@ export function dropLastBucket(resp, panel, series) {
     const shouldDropLastBucket = isLastValueTimerangeMode(panel, series);
 
     if (shouldDropLastBucket) {
+      const wasRequestedByInfra = arguments[5];
+      const defaultValue = Number(wasRequestedByInfra);
+
       const dropLastBucket = series.override_index_pattern
-        ? get(series, 'series_drop_last_bucket', 0)
-        : get(panel, 'drop_last_bucket', 0);
+        ? get(series, 'series_drop_last_bucket', defaultValue)
+        : get(panel, 'drop_last_bucket', defaultValue);
 
       if (dropLastBucket) {
         results.forEach((item) => {

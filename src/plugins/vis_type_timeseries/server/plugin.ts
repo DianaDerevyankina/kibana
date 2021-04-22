@@ -56,7 +56,8 @@ export interface VisTypeTimeseriesSetup {
     requestContext: VisTypeTimeseriesRequestHandlerContext,
     fakeRequest: KibanaRequest,
     // ideally this should be VisPayload type, but currently has inconsistencies with x-pack/plugins/infra/server/lib/adapters/framework/kibana_framework_adapter.ts
-    options: any
+    options: any,
+    wasRequestedByInfra: boolean
   ) => Promise<TimeseriesVisData>;
 }
 
@@ -127,12 +128,14 @@ export class VisTypeTimeseriesPlugin implements Plugin<VisTypeTimeseriesSetup> {
       getVisData: async (
         requestContext: VisTypeTimeseriesRequestHandlerContext,
         fakeRequest: KibanaRequest,
-        options: VisPayload
+        options: VisPayload,
+        wasRequestedByInfra: boolean = false
       ) => {
         return await getVisData(
           requestContext,
           { ...fakeRequest, body: options } as VisTypeTimeseriesVisDataRequest,
-          framework
+          framework,
+          wasRequestedByInfra
         );
       },
     };

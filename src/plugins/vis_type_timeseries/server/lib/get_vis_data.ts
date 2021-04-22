@@ -24,7 +24,8 @@ import { getCachedIndexPatternFetcher } from './search_strategies/lib/cached_ind
 export async function getVisData(
   requestContext: VisTypeTimeseriesRequestHandlerContext,
   request: VisTypeTimeseriesVisDataRequest,
-  framework: Framework
+  framework: Framework,
+  wasRequestedByInfra: boolean = false
 ): Promise<TimeseriesVisData> {
   const uiSettings = requestContext.core.uiSettings.client;
   const esShardTimeout = await framework.getEsShardTimeout();
@@ -44,7 +45,7 @@ export async function getVisData(
     if (panel.type === PANEL_TYPES.TABLE) {
       return getTableData(requestContext, request, panel, services);
     }
-    return getSeriesData(requestContext, request, panel, services);
+    return getSeriesData(requestContext, request, panel, services, wasRequestedByInfra);
   });
 
   return Promise.all(promises).then((res) => {

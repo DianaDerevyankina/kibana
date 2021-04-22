@@ -260,6 +260,6 @@ export class KibanaFramework {
       panels: [model],
       filters,
     };
-    return getVisData(requestContext, rawRequest, options);
+    return getVisData(requestContext, rawRequest, options, true);
   }
 }
